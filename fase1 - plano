@@ -1,0 +1,51 @@
+Excelente escolha! Vamos começar com a Fase 1: Fundamentos de IA e Machine Learning, estruturando um plano semanal com metas claras, recursos recomendados e um projeto prático para consolidar o aprendizado. A ideia é que você avance com consistência e já comece a aplicar IA em contextos de segurança.
+
+📅 Fase 1 – Semana a Semana
+🔹 Semana 1: Fundamentos de IA e Machine Learning
+Objetivo: Entender os conceitos básicos de IA, tipos de aprendizado (supervisionado, não supervisionado, reforço), e aplicações em segurança.
+Tarefas:
+- Assistir ao curso AI for Everyone – Andrew Ng (Coursera)
+- Estudar os conceitos de:
+- Algoritmos de classificação e regressão
+- Overfitting vs. underfitting
+- Métricas de avaliação (accuracy, precision, recall)
+Dica prática: Crie um mapa mental com os principais conceitos e exemplos de aplicação em segurança (ex: classificação de tráfego malicioso).
+
+🔹 Semana 2: Python para IA
+Objetivo: Aprender a programar em Python com foco em análise de dados e IA.
+Tarefas:
+- Curso recomendado: Python for Data Science – DataCamp ou Python para Iniciantes – Curso em Vídeo (gratuito)
+- Praticar com:
+- Manipulação de listas, dicionários e estruturas de dados
+- Uso de bibliotecas como NumPy e Pandas
+- Leitura e tratamento de arquivos .csv com logs de segurança
+Mini-desafio: Ler um arquivo de logs de autenticação e contar tentativas de login por IP.
+
+🔹 Semana 3: Scikit-learn + Pandas para ML
+Objetivo: Aplicar algoritmos de ML com dados reais usando Scikit-learn.
+Tarefas:
+- Curso: Introduction to Machine Learning with Scikit-learn – DataCamp
+- Aprender a usar:
+- train_test_split, fit, predict
+- Algoritmos como Decision Tree, Random Forest, KNN
+- Avaliação com confusion_matrix, classification_report
+Mini-projeto: Criar um modelo que classifica tentativas de login como "normal" ou "suspeita" com base em horário, IP, localização.
+
+🔹 Semana 4: Introdução ao NLP (Processamento de Linguagem Natural)
+Objetivo: Entender como IA pode analisar textos, e-mails, logs e mensagens.
+Tarefas:
+- Curso: NLP with Python – Coursera (HuggingFace)
+- Aprender:
+- Tokenização, stemming, stopwords
+- Classificação de texto com Naive Bayes
+- Detecção de phishing ou spam
+Mini-projeto: Criar um classificador simples que detecta e-mails suspeitos com base em palavras-chave e estrutura.
+
+🧪 Projeto Consolidado da Fase 1
+Desafio: Criar um sistema simples que analisa logs de autenticação e e-mails para detectar comportamentos suspeitos.
+Componentes:
+- Leitura de logs com Pandas
+- Classificação com Scikit-learn
+- Análise de texto com NLP
+- Geração de relatório com alertas
+
