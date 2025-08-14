@@ -1,0 +1,21 @@
+log_classifier_ai/
+├── main.py
+├── requirements.txt
+├── README.md
+├── config.py
+├── data/
+│   ├── input_logs/
+│   └── output_reports/
+├── models/
+│   ├── train_model.py
+│   └── classifier.pkl
+├── modules/
+│   ├── monitor.py
+│   ├── alert.py
+│   ├── dashboard.py
+│   └── export.py
+├── utils/
+│   ├── preprocess.py
+│   └── helpers.py
+└── assets/
+    └── logo.png
