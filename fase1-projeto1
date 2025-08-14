@@ -1,0 +1,95 @@
+ Projeto: Detector de Comportamento Suspeito
+🎯 Objetivo
+Criar um modelo que:
+- Analisa logs de autenticação (IP, horário, localização).
+- Classifica tentativas como "normal" ou "suspeita".
+- Analisa e-mails/textos para detectar phishing ou spam.
+
+📁 Etapa 1: Preparar o Ambiente
+✅ Instalar bibliotecas
+pip install pandas scikit-learn matplotlib seaborn nltk
+
+✅ Importar pacotes
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report, confusion_matrix
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+
+✅ Etapa 2: Logs de Autenticação
+🔹 Exemplo de dataset simulado
+data = {
+    'ip': ['192.168.1.1', '10.0.0.2', '172.16.0.3', '192.168.1.1'],
+    'hora': [2, 14, 3, 23],
+    'localizacao': ['BR', 'US', 'RU', 'BR'],
+    'tentativas': [1, 5, 10, 2],
+    'suspeito': [0, 0, 1, 0]  # 1 = suspeito, 0 = normal
+}
+df = pd.DataFrame(data)
+
+
+🔹 Pré-processamento
+df['localizacao'] = df['localizacao'].map({'BR': 0, 'US': 1, 'RU': 2})
+X = df[['hora', 'localizacao', 'tentativas']]
+y = df['suspeito']
+
+
+🔹 Treinar modelo
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+model = RandomForestClassifier()
+model.fit(X_train, y_train)
+preds = model.predict(X_test)
+print(classification_report(y_test, preds))
+
+
+📧 Etapa 3: Análise de E-mails com NLP
+🔹 Exemplo de e-mails
+emails = [
+    "Clique aqui para ganhar dinheiro rápido!",
+    "Seu acesso foi autorizado com sucesso.",
+    "Atualize sua senha imediatamente clicando neste link.",
+    "Reunião confirmada para amanhã às 10h."
+]
+labels = [1, 0, 1, 0]  # 1 = phishing/spam, 0 = legítimo
+
+
+🔹 Pré-processamento de texto
+nltk.download('punkt')
+nltk.download('stopwords')
+stop_words = set(stopwords.words('portuguese'))
+
+def preprocess(text):
+    tokens = word_tokenize(text.lower())
+    filtered = [w for w in tokens if w.isalpha() and w not in stop_words]
+    return " ".join(filtered)
+
+emails_clean = [preprocess(email) for email in emails]
+
+🔹 Vetorização + Classificação
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.naive_bayes import MultinomialNB
+
+vectorizer = CountVectorizer()
+X = vectorizer.fit_transform(emails_clean)
+model = MultinomialNB()
+model.fit(X, labels)
+preds = model.predict(X)
+print(classification_report(labels, preds))
+
+
+📋 Etapa 4: Relatório Final
+Você pode gerar um relatório simples com os resultados:
+for i, email in enumerate(emails):
+    status = "Suspeito" if preds[i] == 1 else "Legítimo"
+    print(f"Email: {email}\nClassificação: {status}\n")
+
+
+🧠 Próximo Passo
+Quer que eu te ajude a expandir esse projeto com:
+- Interface gráfica simples (usando Streamlit)?
+- Integração com logs reais (ex: Apache, Windows)?
+- Exportação de alertas para Excel ou PDF?
+Me diga como quer evoluir!
