@@ -1,0 +1,187 @@
+Descrição dos Arquivos
+🔹 main.py
+
+import streamlit as st
+from modules import monitor, alert, dashboard, export
+
+st.set_page_config(page_title="Classificador de Segurança com IA", layout="wide")
+st.title("🔐 Classificador Inteligente de Logs e E-mails")
+
+st.markdown("Este sistema analisa logs e mensagens para detectar comportamentos suspeitos usando IA.")
+
+monitor.run()
+alert.run()
+dashboard.run()
+export.run()
+
+======================================================================================================================
+🔹 requirements.txt
+Lista de dependências:
+
+streamlit
+scikit-learn
+pandas
+matplotlib
+watchdog
+telepot
+fpdf
+xlsxwriter
+nltk
+plotly
+==========================================================================================================================
+🔹 config.py
+LOG_PATH = "data/input_logs/"
+REPORT_PATH = "data/output_reports/"
+TELEGRAM_TOKEN = "SEU_TOKEN_DO_BOT"
+TELEGRAM_USER_ID = "SEU_ID_DE_USUARIO"
+EMAIL_ALERT = "seuemail@gmail.com"
+EMAIL_SENHA = "sua_senha"
+
+
+📁 data/
+- input_logs/: onde os arquivos de log são colocados.
+- output_reports/: onde os relatórios exportados são salvos.
+
+📁 models/
+- train_model.py: script para treinar o modelo de IA.
+
+import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
+import joblib
+
+df = pd.read_csv("data/input_logs/exemplo.csv")
+df['localizacao'] = df['localizacao'].map({'BR': 0, 'US': 1, 'RU': 2})
+X = df[['hora', 'localizacao', 'tentativas']]
+y = df['suspeito']
+
+model = RandomForestClassifier()
+model.fit(X, y)
+joblib.dump(model, "models/classifier.pkl")
+
+
+- classifier.pkl: modelo treinado salvo.
+
+import joblib
+import pandas as pd
+
+model = joblib.load("models/classifier.pkl")
+
+def classify_logs(df):
+    df['localizacao'] = df['localizacao'].map({'BR': 0, 'US': 1, 'RU': 2})
+    X = df[['hora', 'localizacao', 'tentativas']]
+    preds = model.predict(X)
+    df['classificacao'] = preds
+    return df
+
+    
+
+📁 modules/
+Cada módulo tem uma função run() que é chamada no main.py.
+monitor.py
+import streamlit as st
+import os
+import pandas as pd
+from config import LOG_PATH
+from models.classifier import classify_logs
+
+def run():
+    st.subheader("📁 Monitoramento de Logs")
+    files = os.listdir(LOG_PATH)
+    if files:
+        file = st.selectbox("Selecione um arquivo de log", files)
+        df = pd.read_csv(os.path.join(LOG_PATH, file))
+        st.write("🔍 Dados carregados:")
+        st.dataframe(df)
+
+        df_result = classify_logs(df)
+        st.write("✅ Classificação:")
+        st.dataframe(df_result)
+        st.session_state['df_result'] = df_result
+    else:
+        st.warning("Nenhum arquivo de log encontrado.")
+
+
+alert.py
+
+import streamlit as st
+import telepot
+from config import TELEGRAM_TOKEN, TELEGRAM_USER_ID
+
+def run():
+    st.subheader("🔔 Alertas Automáticos")
+    if 'df_result' in st.session_state:
+        df = st.session_state['df_result']
+        suspeitos = df[df['classificacao'] == 1]
+        if not suspeitos.empty:
+            bot = telepot.Bot(TELEGRAM_TOKEN)
+            for _, row in suspeitos.iterrows():
+                msg = f"🚨 Alerta: IP {row['ip']} às {row['hora']}h classificado como suspeito."
+                bot.sendMessage(TELEGRAM_USER_ID, msg)
+            st.success("Alertas enviados via Telegram.")
+        else:
+            st.info("Nenhum comportamento suspeito detectado.")
+            
+dashboard.py
+import streamlit as st
+import plotly.express as px
+
+def run():
+    st.subheader("📊 Dashboard Interativo")
+    if 'df_result' in st.session_state:
+        df = st.session_state['df_result']
+        fig = px.histogram(df, x='hora', color='classificacao', title='Tentativas por Hora')
+        st.plotly_chart(fig)
+
+        fig2 = px.pie(df, names='classificacao', title='Distribuição de Classificações')
+        st.plotly_chart(fig2)
+        
+export.py
+import streamlit as st
+from fpdf import FPDF
+import os
+from config import REPORT_PATH
+
+def gerar_pdf(df):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+    pdf.cell(200, 10, txt="Relatório de Segurança", ln=True, align='C')
+    for _, row in df.iterrows():
+        linha = f"{row['ip']} | {row['hora']}h | Classificação: {row['classificacao']}"
+        pdf.cell(200, 10, txt=linha, ln=True)
+    path = os.path.join(REPORT_PATH, "relatorio.pdf")
+    pdf.output(path)
+    return path
+
+def run():
+    st.subheader("📄 Exportação de Relatórios")
+    if 'df_result' in st.session_state:
+        df = st.session_state['df_result']
+        path = gerar_pdf(df)
+        with open(path, "rb") as f:
+            st.download_button("📥 Baixar PDF", f.read(), file_name="relatorio.pdf")
+
+
+
+
+📁 utils/
+Funções auxiliares para pré-processamento formatação.
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+
+nltk.download('punkt')
+nltk.download('stopwords')
+
+def preprocess_text(text):
+    stop_words = set(stopwords.words('portuguese'))
+    tokens = word_tokenize(text.lower())
+    filtered = [w for w in tokens if w.isalpha() and w not in stop_words]
+    return " ".join(filtered)
+
+
+
+📁 assets/
+Imagens e ícones usados no app.
+
+
